@@ -11,18 +11,14 @@ function dXdt = atn_ode_massbalance(time,X,Data,fluo_deriv,kmix)
 communityMatrix = Data.communityMatrix;
 % Functional response exponent parameters for each feeding link
 q = Data.q;
-%q(isnan(q))=0;
 % Feeding interference coefficients for each feeding link
 d = Data.d;
-%d(isnan(d))=0;
 % Relative food preferences of feeders for each feeding link
 omega = Data.omega;
 % Assimilation efficiencies for each feeding link
 e = Data.e;
-%e(isnan(e))=0;
 % Maximum consumption rates for each feeding link
 y = Data.y;
-%y(isnan(y))=0;
 % Half saturation constants to the power of q for each feeding link
 B0_pow_q = Data.B0_pow_q;
 
@@ -31,7 +27,7 @@ B0_pow_q = Data.B0_pow_q;
 % ----------------------------------------------------------------------- %
 
 % Carrying capacity of autotrophs for current year
-K = Data.K.values(Data.year);
+K = Data.K(Data.year);
 % Intrinsic growth rate of producers
 r = Data.r;
 % Competition coefficients of producers
@@ -84,17 +80,6 @@ w = repmat(nps,1,ng);
 omega = A.*w; 
 
 % ----------------------------------------------------------------------- %
-% Fisheries
-% ----------------------------------------------------------------------- %
-Catchable = vertcat(Data.Guilds.catchablenew);
-Catch = Catchable(1:GuildInfo.nGuilds);
-ProducerHarvest = Catch(GuildInfo.iProducerGuilds);
-ConsumerHarvest = Catch(GuildInfo.iConsumerGuilds);
-
-ProducerFisheries = ((0*bProducerGuilds)/100).*ProducerHarvest;
-ConsumerFisheries = ((0*bConsumerGuilds)/100).*ConsumerHarvest;
-
-% ----------------------------------------------------------------------- %
 % -------------------------------- MODEL -------------------------------- %
 % ----------------------------------------------------------------------- %
 
@@ -138,17 +123,15 @@ lConsumerMaintenance = bx.*x.*bConsumerGuilds;
 % ----------------------------------------------------------------------- %
 
 % PRODUCER gain from logistic growth
-G = 1 - (c'*bProducerGuilds + bProducerGuilds)/K;
+G = 1 - (c'*bProducerGuilds)/K;
 gProducerGrowth = r.*bProducerGuilds.*G;
 
 % PRODUCER loss to consumption
 lProducerConsumption = lossVEC(GuildInfo.iProducerGuildsInFood_position_vector);
-lproducerHarvested = ProducerFisheries;
 
 %%%%%%%%%%%%%%%the original below%%%%%%%%%%%%%
 dBdt(GuildInfo.iProducerGuilds) = + gProducerGrowth ...
-                                  - lProducerConsumption...
-                                  - lproducerHarvested;
+                                  - lProducerConsumption;
 
 %foodweb plankton
 dBdt(95)  = dBdt(95) + kmix*max(B(108)-B(95),0);
@@ -179,12 +162,9 @@ xxAnew1 = xxAnew';
 lConsumerConsumption2 = xxAnew1(GuildInfo.iConsumerGuilds); 
 
 %-------------------------------------------------------------------------%
-lconsumerHarvested = ConsumerFisheries;
-
 dBdt(GuildInfo.iConsumerGuilds) = - lConsumerMaintenance ...
                                   + gConsumerConsumption ...
-                                  - lConsumerConsumption2 ...
-                                  - lconsumerHarvested;
+                                  - lConsumerConsumption2;
 
 % ----------------------------------------------------------------------- %
 % CONCATENATE DERIVATIVES OF BIOMASSES, CATCHES, GAIN FISH, GAIN AND LOSS

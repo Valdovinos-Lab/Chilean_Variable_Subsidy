@@ -6,7 +6,7 @@ clock1 = clock;
 kmix = 1;
 
 t_init = 0;
-t_final = 365*24; %(Should run to 365*24 for actual runs.)
+t_final = 365*24*10; %(Should run to 365*24 for actual runs.)
 tspan = t_init:t_final; 
 Data.K.type = 'Constant';
 Data.K.mean = 176299; 
@@ -21,7 +21,9 @@ Binds = 1:GuildInfo.nGuilds;
 Binit = vertcat(Data.Guilds.binit);
 
 Binit(95)=0;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Binit(107)=4500;%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Data.year = 1;
 
 options = odeset('AbsTol',1.000000000000000e-10,'RelTol',1.000000000000000e-08);

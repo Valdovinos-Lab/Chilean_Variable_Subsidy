@@ -31,7 +31,8 @@ B0_pow_q = Data.B0_pow_q;
 % ----------------------------------------------------------------------- %
 
 % Carrying capacity of autotrophs for current year
-K = Data.K.values(Data.year);
+K = Data.K;
+K = K.mean;
 % Intrinsic growth rate of producers
 r = Data.r;
 % Competition coefficients of producers
@@ -138,7 +139,7 @@ lConsumerMaintenance = bx.*x.*bConsumerGuilds;
 % ----------------------------------------------------------------------- %
 
 % PRODUCER gain from logistic growth
-G = 1 - (c'*bProducerGuilds + bProducerGuilds)/K;
+G = 1 - (c'*bProducerGuilds)/K;
 gProducerGrowth = r.*bProducerGuilds.*G;
 
 % PRODUCER loss to consumption

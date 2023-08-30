@@ -33,35 +33,7 @@ Data.y = Data.y(GuildInfo.iFeederGuilds,GuildInfo.iFoodGuilds);
 Data.B0_pow_q = Data.B0.^Data.q;
 Data.B0_pow_q = Data.B0_pow_q.*Data.communityMatrix;
 
-switch Data.K.type
-    case 'Constant'
-        %%%K = repmat(Data.K.mean,1,Data.nYearsFwd); this is the original
-        %%%but with the changes MATLAB suggest to me that change to
-        %%%repmat(A,[M,N])
-        K = repmat(Data.K.mean,[1,Data.nYearsFwd]);
-                
-    case 'White noise'
-        K = zeros(1,Data.nYearsFwd);
-        for i = 1:Data.nYearsFwd
-            while K(i) <= 0
-                K(i) = normrnd(Data.K.mean,Data.K.standard_deviation,1,1);
-            end
-        end
+K = repmat(Data.K,[1,Data.nYearsFwd]);
+Data.K = K;        
         
-    case 'AR(1)'
-        K = zeros(1,Data.nYearsFwd);
-        phi = Data.K.autocorrelation;
-        c = Data.K.mean*(1-phi);
-        sigma_e = Data.K.standard_deviation*sqrt(1-phi^2);
-        
-        while K(1) <= 0
-            K(1) = normrnd(Data.K.mean,Data.K.standard_deviation,1,1);
-            for i = 2:Data.nYearsFwd
-                while K(i) <= 0
-                    K(i) = c + phi*K(i-1) + normrnd(0,sigma_e,1,1);
-                end
-            end
-        end
 end
-Data.K.values = K;        
-        
